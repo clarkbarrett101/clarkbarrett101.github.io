@@ -5,11 +5,93 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>SCANvas</title>
 </head>
 
 <body>
-    <h1>Testing.. testing...</h1>
+    <h1> SCANvas</h1>
+    <input type="file" id="fileinput" />
+    <div id="points"></div>
+    <div id="ReadResult"></div>
+    <table>
+        <thead>
+            <th>Assignment</th>
+            <th>Due Date</th>
+            <th>Points</th>
+            <th>Percent</th>
+            <th>Submission</th>
+        </thead>
+    </table>
 </body>
+<script type="text/javascript">
+    function readSingleFile(evt) {
+        var f = evt.target.files[0];
+
+        if (f) {
+            var r = new FileReader();
+            r.onload = function (e) {
+                var contents = e.target.result;
+                let pts = parsePoints(contents);
+                let pTotal = 0;
+                for (let i = 0; i < pts.length; i++) {
+                    pTotal += pts[i];
+                }
+                document.getElementById("points").innerText = pTotal;
+                document.getElementById("ReadResult").innerText = pts;
+
+            }
+            r.readAsText(f);
+        } else {
+            alert("Failed to load file");
+        }
+    }
+
+    document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
+    function parseDuedate(stuff) {
+        let dues = new Array();
+        let sbs = stuff.split('<td class="due">');
+        for (let i = 1; i < sbs.length; i++) {
+            let due = sbs[i].split("</td>");
+            dues[i - 1] = due[0];
+        }
+        return dues;
+    }
+    function parsePoints(stuff) {
+        let dues = new Array();
+        let sbs = stuff.split('<td class="possible points_possible">');
+        for (let i = 1; i < sbs.length - 1; i++) {
+            let due = sbs[i].split("</td>");
+            dues[i - 1] = parseFloat(due[0]);
+
+        }
+        return dues;
+    }
+    function myFunction() {
+        let table = document.getElementById("table");
+        for (let i = 0; i < pts.length; i++) {
+            let tr = document.createElement("tr");
+            let newAssign = document.createElement("td");
+            newAssign.innerText = subs[i];
+            let newDue = document.createElement("td");
+            newDue.innerText = dueDates[i];
+            let newPts = document.createElement("td");
+            newPts.innerText = pts[i];
+            let newPerc = document.createElement("td");
+            newPerc.innerText = percs[i];
+            let newSub = document.createElement("td");
+            newSub.innerText = subs[i];
+            tr.appendChild(newAssign);
+            tr.appendChild(newDue);
+            tr.appendChild(newPts);
+            tr.appendChild(newPerc);
+            tr.appendChild(newSub);
+        }
+        let percs = new Array();
+        for (let i = 0; i < pts.length; i++) {
+            percs[i] = pts / pTotal;
+        }
+    }
+</script>
+}
 
 </html>
