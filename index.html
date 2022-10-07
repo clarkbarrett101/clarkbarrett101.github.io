@@ -13,7 +13,7 @@
     <input type="file" id="fileinput" />
     <div id="points"></div>
     <div id="ReadResult"></div>
-    <table>
+    <table id="table">
         <thead>
             <th>Assignment</th>
             <th>Due Date</th>
@@ -31,14 +31,41 @@
             var r = new FileReader();
             r.onload = function (e) {
                 var contents = e.target.result;
+                substr = contents.split('<tr class="student_assignment hard_coded group_total"');
+                contents = substr[0];
                 let pts = parsePoints(contents);
                 let pTotal = 0;
                 for (let i = 0; i < pts.length; i++) {
                     pTotal += pts[i];
                 }
-                document.getElementById("points").innerText = pTotal;
-                document.getElementById("ReadResult").innerText = pts;
-
+                let assigns = parseAssignments(contents);
+                let subs = parseSubs(contents);
+                let dueDates = parseDuedate(contents);
+                let percs = new Array();
+                for (let i = 0; i < pts.length; i++) {
+                    percs[i] = Math.round((pts[i] / pTotal) * 10000) / 100;
+                }
+                let table = document.getElementById("table");
+                for (let i = 0; i < pts.length; i++) {
+                    let tr = document.createElement("tr");
+                    let newAssign = document.createElement("td");
+                    newAssign.innerHTML = assigns[i];
+                    let newDue = document.createElement("td");
+                    newDue.innerText = dueDates[i];
+                    let newPts = document.createElement("td");
+                    newPts.innerText = pts[i];
+                    let newPerc = document.createElement("td");
+                    newPerc.innerText = percs[i] + "%";
+                    let newSub = document.createElement("td");
+                    newSub.innerText = subs[i];
+                    table.appendChild(tr);
+                    tr.appendChild(newAssign);
+                    tr.appendChild(newDue);
+                    tr.appendChild(newPts);
+                    tr.appendChild(newPerc);
+                    tr.appendChild(newSub);
+                }
+                document.getElementById("points").innerText = pTotal + " Points Total";
             }
             r.readAsText(f);
         } else {
@@ -59,37 +86,33 @@
     function parsePoints(stuff) {
         let dues = new Array();
         let sbs = stuff.split('<td class="possible points_possible">');
-        for (let i = 1; i < sbs.length - 1; i++) {
+        for (let i = 1; i < sbs.length; i++) {
             let due = sbs[i].split("</td>");
             dues[i - 1] = parseFloat(due[0]);
 
         }
         return dues;
     }
+    function parseAssignments(stuff) {
+        let dues = new Array();
+        let sbs = stuff.split('<th class="title" scope="row">');
+        for (let i = 1; i < sbs.length; i++) {
+            let due = sbs[i].split('<div class="context">');
+            dues[i - 1] = due[0];
+        }
+        return dues;
+    }
+    function parseSubs(stuff) {
+        let dues = new Array();
+        let sbs = stuff.split('<span class="submission_status">');
+        for (let i = 1; i < sbs.length; i++) {
+            let due = sbs[i].split('</span>');
+            dues[i - 1] = due[0];
+        }
+        return dues;
+    }
     function myFunction() {
-        let table = document.getElementById("table");
-        for (let i = 0; i < pts.length; i++) {
-            let tr = document.createElement("tr");
-            let newAssign = document.createElement("td");
-            newAssign.innerText = subs[i];
-            let newDue = document.createElement("td");
-            newDue.innerText = dueDates[i];
-            let newPts = document.createElement("td");
-            newPts.innerText = pts[i];
-            let newPerc = document.createElement("td");
-            newPerc.innerText = percs[i];
-            let newSub = document.createElement("td");
-            newSub.innerText = subs[i];
-            tr.appendChild(newAssign);
-            tr.appendChild(newDue);
-            tr.appendChild(newPts);
-            tr.appendChild(newPerc);
-            tr.appendChild(newSub);
-        }
-        let percs = new Array();
-        for (let i = 0; i < pts.length; i++) {
-            percs[i] = pts / pTotal;
-        }
+
     }
 </script>
 }
